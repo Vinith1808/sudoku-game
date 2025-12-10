@@ -1,10 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
-import { motion } from "framer-motion";
-import { ArrowLeft, Pause, Play } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, Pause, Play, Settings, Trophy, Cpu, Save } from "lucide-react";
 import { SudokuBoard } from "./SudokuBoard";
 import { NumberPad } from "./NumberPad";
 import { GameHeader } from "./GameHeader";
 import { GameComplete } from "./GameComplete";
+import { AISolver } from "./AISolver";
+import { Leaderboard } from "./Leaderboard";
+import { SettingsPanel } from "./SettingsPanel";
 import {
   generatePuzzle,
   checkValue,
@@ -13,16 +16,19 @@ import {
   type Board,
   type Move,
 } from "@/lib/sudoku";
+import { useGamePersistence, useLeaderboard, type SavedGame } from "@/hooks/useGamePersistence";
+import { useSoundEffects, useAmbientMusic } from "@/hooks/useSoundEffects";
 import { toast } from "@/hooks/use-toast";
 
 interface SudokuGameProps {
   difficulty: Difficulty;
   onBack: () => void;
+  savedGame?: SavedGame | null;
 }
 
 const MAX_MISTAKES = 3;
 
-export function SudokuGame({ difficulty, onBack }: SudokuGameProps) {
+export function SudokuGame({ difficulty, onBack, savedGame }: SudokuGameProps) {
   const [board, setBoard] = useState<Board>([]);
   const [solution, setSolution] = useState<number[][]>([]);
   const [selectedCell, setSelectedCell] = useState<{ row: number; col: number } | null>(null);
@@ -35,23 +41,69 @@ export function SudokuGame({ difficulty, onBack }: SudokuGameProps) {
   const [elapsedTime, setElapsedTime] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [cellAnimationKeys, setCellAnimationKeys] = useState<string[][]>([]);
+  const [showAISolver, setShowAISolver] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+
+  const { saveGame, clearSavedGame } = useGamePersistence();
+  const { addEntry } = useLeaderboard();
+  const { playSound, soundEnabled, toggleSound, initAudio } = useSoundEffects();
+  const { toggleMusic, musicEnabled, startMusic } = useAmbientMusic();
 
   // Initialize game
   useEffect(() => {
-    const { puzzle, solution: sol } = generatePuzzle(difficulty);
-    setBoard(puzzle);
-    setSolution(sol);
-    setCellAnimationKeys(
-      puzzle.map((row, ri) => row.map((_, ci) => `${ri}-${ci}-${Date.now()}`))
-    );
-    setMistakes(0);
-    setHintsUsed(0);
-    setMoveHistory([]);
+    if (savedGame && savedGame.difficulty === difficulty) {
+      // Load saved game
+      setBoard(savedGame.board);
+      setSolution(savedGame.solution);
+      setMistakes(savedGame.mistakes);
+      setHintsUsed(savedGame.hintsUsed);
+      setElapsedTime(savedGame.elapsedTime);
+      setMoveHistory(savedGame.moveHistory);
+      setCellAnimationKeys(
+        savedGame.board.map((row, ri) => row.map((_, ci) => `${ri}-${ci}-${Date.now()}`))
+      );
+      toast({
+        title: "Game Restored",
+        description: "Your previous game has been loaded.",
+      });
+    } else {
+      // New game
+      const { puzzle, solution: sol } = generatePuzzle(difficulty);
+      setBoard(puzzle);
+      setSolution(sol);
+      setCellAnimationKeys(
+        puzzle.map((row, ri) => row.map((_, ci) => `${ri}-${ci}-${Date.now()}`))
+      );
+      setMistakes(0);
+      setHintsUsed(0);
+      setMoveHistory([]);
+      setElapsedTime(0);
+    }
     setIsComplete(false);
     setIsGameOver(false);
-    setElapsedTime(0);
     setSelectedCell(null);
-  }, [difficulty]);
+  }, [difficulty, savedGame]);
+
+  // Auto-save game periodically
+  useEffect(() => {
+    if (isComplete || isGameOver || board.length === 0) return;
+
+    const saveInterval = setInterval(() => {
+      saveGame({
+        board,
+        solution,
+        difficulty,
+        mistakes,
+        hintsUsed,
+        elapsedTime,
+        moveHistory,
+        savedAt: Date.now(),
+      });
+    }, 10000); // Save every 10 seconds
+
+    return () => clearInterval(saveInterval);
+  }, [board, solution, difficulty, mistakes, hintsUsed, elapsedTime, moveHistory, isComplete, isGameOver, saveGame]);
 
   // Timer
   useEffect(() => {
@@ -64,10 +116,23 @@ export function SudokuGame({ difficulty, onBack }: SudokuGameProps) {
     return () => clearInterval(interval);
   }, [isComplete, isGameOver, isPaused]);
 
+  // Start ambient music on first interaction
+  useEffect(() => {
+    const handleFirstInteraction = () => {
+      initAudio();
+      if (musicEnabled) {
+        startMusic();
+      }
+      document.removeEventListener("click", handleFirstInteraction);
+    };
+    document.addEventListener("click", handleFirstInteraction);
+    return () => document.removeEventListener("click", handleFirstInteraction);
+  }, [initAudio, musicEnabled, startMusic]);
+
   // Keyboard support
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (isComplete || isGameOver) return;
+      if (isComplete || isGameOver || showAISolver || showLeaderboard || showSettings) return;
 
       if (e.key >= "1" && e.key <= "9") {
         handleNumberInput(parseInt(e.key));
@@ -79,18 +144,22 @@ export function SudokuGame({ difficulty, onBack }: SudokuGameProps) {
         handleUndo();
       } else if (e.key === "ArrowUp" && selectedCell && selectedCell.row > 0) {
         setSelectedCell({ ...selectedCell, row: selectedCell.row - 1 });
+        playSound("click");
       } else if (e.key === "ArrowDown" && selectedCell && selectedCell.row < 8) {
         setSelectedCell({ ...selectedCell, row: selectedCell.row + 1 });
+        playSound("click");
       } else if (e.key === "ArrowLeft" && selectedCell && selectedCell.col > 0) {
         setSelectedCell({ ...selectedCell, col: selectedCell.col - 1 });
+        playSound("click");
       } else if (e.key === "ArrowRight" && selectedCell && selectedCell.col < 8) {
         setSelectedCell({ ...selectedCell, col: selectedCell.col + 1 });
+        playSound("click");
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedCell, notesMode, isComplete, isGameOver]);
+  }, [selectedCell, notesMode, isComplete, isGameOver, showAISolver, showLeaderboard, showSettings]);
 
   const updateCellAnimationKey = (row: number, col: number) => {
     setCellAnimationKeys((prev) => {
@@ -131,6 +200,7 @@ export function SudokuGame({ difficulty, onBack }: SudokuGameProps) {
           newBoard[row][col].value = null;
           return newBoard;
         });
+        playSound("click");
       } else {
         const isCorrect = checkValue(solution, row, col, num);
 
@@ -161,6 +231,7 @@ export function SudokuGame({ difficulty, onBack }: SudokuGameProps) {
         updateCellAnimationKey(row, col);
 
         if (!isCorrect) {
+          playSound("error");
           const newMistakes = mistakes + 1;
           setMistakes(newMistakes);
           
@@ -172,18 +243,23 @@ export function SudokuGame({ difficulty, onBack }: SudokuGameProps) {
 
           if (newMistakes >= MAX_MISTAKES) {
             setIsGameOver(true);
+            clearSavedGame();
           }
         } else {
+          playSound("place");
           // Check if complete
           const newBoard = board.map((r) => r.map((c) => ({ ...c })));
           newBoard[row][col].value = num;
           if (isBoardComplete(newBoard, solution)) {
             setIsComplete(true);
+            clearSavedGame();
+            playSound("complete");
+            addEntry({ difficulty, time: elapsedTime, mistakes, hintsUsed });
           }
         }
       }
     },
-    [board, selectedCell, notesMode, solution, mistakes, isComplete, isGameOver]
+    [board, selectedCell, notesMode, solution, mistakes, isComplete, isGameOver, playSound, clearSavedGame, addEntry, difficulty, elapsedTime, hintsUsed]
   );
 
   const handleErase = useCallback(() => {
@@ -214,7 +290,8 @@ export function SudokuGame({ difficulty, onBack }: SudokuGameProps) {
     });
 
     updateCellAnimationKey(row, col);
-  }, [board, selectedCell, isComplete, isGameOver]);
+    playSound("click");
+  }, [board, selectedCell, isComplete, isGameOver, playSound]);
 
   const handleUndo = useCallback(() => {
     if (moveHistory.length === 0 || isComplete || isGameOver) return;
@@ -231,7 +308,8 @@ export function SudokuGame({ difficulty, onBack }: SudokuGameProps) {
     });
 
     updateCellAnimationKey(lastMove.row, lastMove.col);
-  }, [moveHistory, isComplete, isGameOver]);
+    playSound("undo");
+  }, [moveHistory, isComplete, isGameOver, playSound]);
 
   const handleHint = useCallback(() => {
     if (isComplete || isGameOver) return;
@@ -272,14 +350,23 @@ export function SudokuGame({ difficulty, onBack }: SudokuGameProps) {
     updateCellAnimationKey(randomCell.row, randomCell.col);
     setHintsUsed((prev) => prev + 1);
     setSelectedCell(randomCell);
+    playSound("hint");
 
     // Check if complete after hint
     const newBoard = board.map((r) => r.map((c) => ({ ...c })));
     newBoard[randomCell.row][randomCell.col].value = correctValue;
     if (isBoardComplete(newBoard, solution)) {
       setIsComplete(true);
+      clearSavedGame();
+      playSound("complete");
+      addEntry({ difficulty, time: elapsedTime, mistakes, hintsUsed: hintsUsed + 1 });
     }
-  }, [board, solution, isComplete, isGameOver]);
+  }, [board, solution, isComplete, isGameOver, playSound, clearSavedGame, addEntry, difficulty, elapsedTime, mistakes, hintsUsed]);
+
+  const handleCellClick = (row: number, col: number) => {
+    setSelectedCell({ row, col });
+    playSound("click");
+  };
 
   // Calculate number counts
   const numberCounts = Array.from({ length: 9 }, (_, i) => i + 1).reduce(
@@ -292,6 +379,24 @@ export function SudokuGame({ difficulty, onBack }: SudokuGameProps) {
     },
     {} as Record<number, number>
   );
+
+  const handleSaveAndExit = () => {
+    saveGame({
+      board,
+      solution,
+      difficulty,
+      mistakes,
+      hintsUsed,
+      elapsedTime,
+      moveHistory,
+      savedAt: Date.now(),
+    });
+    toast({
+      title: "Game Saved",
+      description: "Your progress has been saved.",
+    });
+    onBack();
+  };
 
   return (
     <div className="min-h-screen flex flex-col p-4 relative">
@@ -315,22 +420,48 @@ export function SudokuGame({ difficulty, onBack }: SudokuGameProps) {
         className="flex items-center justify-between mb-4 relative z-10"
       >
         <button
-          onClick={onBack}
+          onClick={handleSaveAndExit}
           className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors font-rajdhani"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span className="hidden sm:inline">Back</span>
+          <span className="hidden sm:inline">Save & Exit</span>
         </button>
 
-        <button
-          onClick={() => setIsPaused((p) => !p)}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary text-foreground hover:bg-primary/20 transition-colors"
-        >
-          {isPaused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
-          <span className="hidden sm:inline font-rajdhani">
-            {isPaused ? "Resume" : "Pause"}
-          </span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowLeaderboard(true)}
+            className="p-2 rounded-lg bg-secondary text-foreground hover:bg-primary/20 transition-colors"
+            title="Leaderboard"
+          >
+            <Trophy className="w-5 h-5" />
+          </button>
+
+          <button
+            onClick={() => setShowAISolver(true)}
+            className="p-2 rounded-lg bg-secondary text-foreground hover:bg-primary/20 transition-colors"
+            title="AI Solver"
+          >
+            <Cpu className="w-5 h-5" />
+          </button>
+
+          <button
+            onClick={() => setShowSettings(true)}
+            className="p-2 rounded-lg bg-secondary text-foreground hover:bg-primary/20 transition-colors"
+            title="Settings"
+          >
+            <Settings className="w-5 h-5" />
+          </button>
+
+          <button
+            onClick={() => setIsPaused((p) => !p)}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary text-foreground hover:bg-primary/20 transition-colors"
+          >
+            {isPaused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
+            <span className="hidden sm:inline font-rajdhani">
+              {isPaused ? "Resume" : "Pause"}
+            </span>
+          </button>
+        </div>
       </motion.div>
 
       {/* Game area */}
@@ -364,7 +495,7 @@ export function SudokuGame({ difficulty, onBack }: SudokuGameProps) {
             <SudokuBoard
               board={board}
               selectedCell={selectedCell}
-              onCellClick={(row, col) => setSelectedCell({ row, col })}
+              onCellClick={handleCellClick}
               cellAnimationKeys={cellAnimationKeys}
             />
 
@@ -393,6 +524,39 @@ export function SudokuGame({ difficulty, onBack }: SudokuGameProps) {
           isWin={isComplete}
         />
       )}
+
+      {/* AI Solver modal */}
+      <AnimatePresence>
+        {showAISolver && board.length > 0 && (
+          <AISolver
+            initialBoard={board}
+            onClose={() => setShowAISolver(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Leaderboard modal */}
+      <AnimatePresence>
+        {showLeaderboard && (
+          <Leaderboard
+            onClose={() => setShowLeaderboard(false)}
+            currentDifficulty={difficulty}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Settings modal */}
+      <AnimatePresence>
+        {showSettings && (
+          <SettingsPanel
+            onClose={() => setShowSettings(false)}
+            soundEnabled={soundEnabled}
+            onToggleSound={toggleSound}
+            musicEnabled={musicEnabled}
+            onToggleMusic={toggleMusic}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

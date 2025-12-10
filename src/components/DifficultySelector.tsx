@@ -1,10 +1,16 @@
-import { motion } from "framer-motion";
-import { Zap, Target, Flame, Skull } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Zap, Target, Flame, Skull, Trophy, Settings, Moon, Sun, RotateCcw } from "lucide-react";
 import type { Difficulty } from "@/lib/sudoku";
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/hooks/useTheme";
+import { useState } from "react";
+import { Leaderboard } from "./Leaderboard";
 
 interface DifficultySelectorProps {
   onSelect: (difficulty: Difficulty) => void;
+  hasSavedGame: boolean;
+  savedGameDifficulty?: Difficulty;
+  onContinue: () => void;
 }
 
 const difficulties: { level: Difficulty; label: string; icon: React.ReactNode; description: string; color: string }[] = [
@@ -38,7 +44,10 @@ const difficulties: { level: Difficulty; label: string; icon: React.ReactNode; d
   },
 ];
 
-export function DifficultySelector({ onSelect }: DifficultySelectorProps) {
+export function DifficultySelector({ onSelect, hasSavedGame, savedGameDifficulty, onContinue }: DifficultySelectorProps) {
+  const { theme, toggleTheme } = useTheme();
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -65,12 +74,35 @@ export function DifficultySelector({ onSelect }: DifficultySelectorProps) {
         transition={{ duration: 4, repeat: Infinity, delay: 2 }}
       />
 
+      {/* Top controls */}
+      <div className="absolute top-4 right-4 flex items-center gap-2 z-20">
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setShowLeaderboard(true)}
+          className="p-3 rounded-lg bg-card border border-border text-foreground hover:text-primary transition-colors"
+          title="Leaderboard"
+        >
+          <Trophy className="w-5 h-5" />
+        </motion.button>
+
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={toggleTheme}
+          className="p-3 rounded-lg bg-card border border-border text-foreground hover:text-primary transition-colors"
+          title="Toggle theme"
+        >
+          {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+        </motion.button>
+      </div>
+
       {/* Title */}
       <motion.div
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="text-center mb-12 relative z-10"
+        className="text-center mb-8 relative z-10"
       >
         <h1 className="text-4xl sm:text-6xl md:text-7xl font-orbitron font-bold text-glow-primary mb-4">
           SUDOKU
@@ -80,6 +112,29 @@ export function DifficultySelector({ onSelect }: DifficultySelectorProps) {
         </p>
       </motion.div>
 
+      {/* Continue button if saved game exists */}
+      {hasSavedGame && (
+        <motion.div
+          initial={{ y: 30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.2 }}
+          className="mb-6 relative z-10"
+        >
+          <motion.button
+            onClick={onContinue}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.98 }}
+            className="flex items-center gap-3 px-8 py-4 rounded-xl bg-gradient-to-r from-primary to-accent text-primary-foreground font-orbitron font-bold box-glow-primary"
+          >
+            <RotateCcw className="w-5 h-5" />
+            Continue {savedGameDifficulty && `(${savedGameDifficulty})`}
+          </motion.button>
+          <p className="text-center text-sm text-muted-foreground mt-2">
+            or start a new game below
+          </p>
+        </motion.div>
+      )}
+
       {/* Difficulty cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl w-full relative z-10">
         {difficulties.map((diff, index) => (
@@ -88,7 +143,7 @@ export function DifficultySelector({ onSelect }: DifficultySelectorProps) {
             onClick={() => onSelect(diff.level)}
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.4, delay: 0.1 * index }}
+            transition={{ duration: 0.4, delay: 0.1 * index + (hasSavedGame ? 0.3 : 0) }}
             whileHover={{ scale: 1.05, y: -5 }}
             whileTap={{ scale: 0.98 }}
             className={cn(
@@ -111,6 +166,15 @@ export function DifficultySelector({ onSelect }: DifficultySelectorProps) {
           </motion.button>
         ))}
       </div>
+
+      {/* Leaderboard modal */}
+      <AnimatePresence>
+        {showLeaderboard && (
+          <Leaderboard
+            onClose={() => setShowLeaderboard(false)}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
