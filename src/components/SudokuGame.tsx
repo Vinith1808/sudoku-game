@@ -24,11 +24,13 @@ interface SudokuGameProps {
   difficulty: Difficulty;
   onBack: () => void;
   savedGame?: SavedGame | null;
+  dailyBoard?: { board: Board; solution: number[][] } | null;
+  onGameComplete?: (won: boolean, time: number, mistakes: number, hintsUsed: number) => void;
 }
 
 const MAX_MISTAKES = 3;
 
-export function SudokuGame({ difficulty, onBack, savedGame }: SudokuGameProps) {
+export function SudokuGame({ difficulty, onBack, savedGame, dailyBoard, onGameComplete }: SudokuGameProps) {
   const [board, setBoard] = useState<Board>([]);
   const [solution, setSolution] = useState<number[][]>([]);
   const [selectedCell, setSelectedCell] = useState<{ row: number; col: number } | null>(null);
@@ -52,7 +54,18 @@ export function SudokuGame({ difficulty, onBack, savedGame }: SudokuGameProps) {
 
   // Initialize game
   useEffect(() => {
-    if (savedGame && savedGame.difficulty === difficulty) {
+    if (dailyBoard) {
+      // Daily challenge
+      setBoard(dailyBoard.board.map(row => row.map(cell => ({ ...cell }))));
+      setSolution(dailyBoard.solution);
+      setCellAnimationKeys(
+        dailyBoard.board.map((row, ri) => row.map((_, ci) => `${ri}-${ci}-${Date.now()}`))
+      );
+      setMistakes(0);
+      setHintsUsed(0);
+      setMoveHistory([]);
+      setElapsedTime(0);
+    } else if (savedGame && savedGame.difficulty === difficulty) {
       // Load saved game
       setBoard(savedGame.board);
       setSolution(savedGame.solution);
@@ -83,7 +96,7 @@ export function SudokuGame({ difficulty, onBack, savedGame }: SudokuGameProps) {
     setIsComplete(false);
     setIsGameOver(false);
     setSelectedCell(null);
-  }, [difficulty, savedGame]);
+  }, [difficulty, savedGame, dailyBoard]);
 
   // Auto-save game periodically
   useEffect(() => {
@@ -244,6 +257,7 @@ export function SudokuGame({ difficulty, onBack, savedGame }: SudokuGameProps) {
           if (newMistakes >= MAX_MISTAKES) {
             setIsGameOver(true);
             clearSavedGame();
+            onGameComplete?.(false, elapsedTime, newMistakes, hintsUsed);
           }
         } else {
           playSound("place");
@@ -255,6 +269,7 @@ export function SudokuGame({ difficulty, onBack, savedGame }: SudokuGameProps) {
             clearSavedGame();
             playSound("complete");
             addEntry({ difficulty, time: elapsedTime, mistakes, hintsUsed });
+            onGameComplete?.(true, elapsedTime, mistakes, hintsUsed);
           }
         }
       }
