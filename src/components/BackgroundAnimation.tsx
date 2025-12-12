@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { useTheme } from '@/hooks/useTheme';
 
 interface Particle {
   x: number;
@@ -16,6 +17,7 @@ const BackgroundAnimation = () => {
   const particlesRef = useRef<Particle[]>([]);
   const mouseRef = useRef({ x: 0, y: 0 });
   const animationRef = useRef<number>();
+  const { theme } = useTheme();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -32,6 +34,13 @@ const BackgroundAnimation = () => {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
+    // Theme-aware colors
+    const isDark = theme === 'dark';
+    const fadeColor = isDark ? 'rgba(10, 15, 25, 0.08)' : 'rgba(240, 245, 250, 0.12)';
+    const particleLightness = isDark ? 60 : 45;
+    const connectionLightness = isDark ? 50 : 40;
+    const baseOpacity = isDark ? 0.5 : 0.35;
+
     // Initialize particles
     const particleCount = 50;
     particlesRef.current = Array.from({ length: particleCount }, () => ({
@@ -40,7 +49,7 @@ const BackgroundAnimation = () => {
       vx: (Math.random() - 0.5) * 0.5,
       vy: (Math.random() - 0.5) * 0.5,
       size: Math.random() * 3 + 1,
-      opacity: Math.random() * 0.5 + 0.1,
+      opacity: Math.random() * baseOpacity + 0.1,
       hue: Math.random() * 60 + 160, // Cyan to purple range
     }));
 
@@ -51,7 +60,7 @@ const BackgroundAnimation = () => {
     window.addEventListener('mousemove', handleMouseMove);
 
     const animate = () => {
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillStyle = fadeColor;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       particlesRef.current.forEach((particle, i) => {
@@ -83,7 +92,7 @@ const BackgroundAnimation = () => {
         // Draw particle
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-        ctx.fillStyle = `hsla(${particle.hue}, 80%, 60%, ${particle.opacity})`;
+        ctx.fillStyle = `hsla(${particle.hue}, 80%, ${particleLightness}%, ${particle.opacity})`;
         ctx.fill();
 
         // Draw connections
@@ -95,7 +104,8 @@ const BackgroundAnimation = () => {
             ctx.beginPath();
             ctx.moveTo(particle.x, particle.y);
             ctx.lineTo(other.x, other.y);
-            ctx.strokeStyle = `hsla(${(particle.hue + other.hue) / 2}, 70%, 50%, ${0.15 * (1 - dist / 120)})`;
+            const connectionOpacity = isDark ? 0.15 : 0.2;
+            ctx.strokeStyle = `hsla(${(particle.hue + other.hue) / 2}, 70%, ${connectionLightness}%, ${connectionOpacity * (1 - dist / 120)})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }
@@ -114,24 +124,24 @@ const BackgroundAnimation = () => {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, []);
+  }, [theme]);
 
   return (
     <>
       <canvas
         ref={canvasRef}
         className="fixed inset-0 pointer-events-none z-0"
-        style={{ opacity: 0.6 }}
+        style={{ opacity: theme === 'dark' ? 0.6 : 0.4 }}
       />
       {/* Gradient overlays */}
       <motion.div
         className="fixed inset-0 pointer-events-none z-0"
         animate={{
           background: [
-            'radial-gradient(circle at 20% 80%, hsla(var(--primary), 0.15) 0%, transparent 50%)',
-            'radial-gradient(circle at 80% 20%, hsla(var(--primary), 0.15) 0%, transparent 50%)',
-            'radial-gradient(circle at 50% 50%, hsla(var(--primary), 0.1) 0%, transparent 50%)',
-            'radial-gradient(circle at 20% 80%, hsla(var(--primary), 0.15) 0%, transparent 50%)',
+            'radial-gradient(circle at 20% 80%, hsl(var(--primary) / 0.15) 0%, transparent 50%)',
+            'radial-gradient(circle at 80% 20%, hsl(var(--primary) / 0.15) 0%, transparent 50%)',
+            'radial-gradient(circle at 50% 50%, hsl(var(--primary) / 0.1) 0%, transparent 50%)',
+            'radial-gradient(circle at 20% 80%, hsl(var(--primary) / 0.15) 0%, transparent 50%)',
           ],
         }}
         transition={{
@@ -144,9 +154,9 @@ const BackgroundAnimation = () => {
         className="fixed inset-0 pointer-events-none z-0"
         animate={{
           background: [
-            'radial-gradient(circle at 80% 80%, hsla(var(--accent), 0.1) 0%, transparent 40%)',
-            'radial-gradient(circle at 20% 20%, hsla(var(--accent), 0.1) 0%, transparent 40%)',
-            'radial-gradient(circle at 80% 80%, hsla(var(--accent), 0.1) 0%, transparent 40%)',
+            'radial-gradient(circle at 80% 80%, hsl(var(--accent) / 0.1) 0%, transparent 40%)',
+            'radial-gradient(circle at 20% 20%, hsl(var(--accent) / 0.1) 0%, transparent 40%)',
+            'radial-gradient(circle at 80% 80%, hsl(var(--accent) / 0.1) 0%, transparent 40%)',
           ],
         }}
         transition={{
