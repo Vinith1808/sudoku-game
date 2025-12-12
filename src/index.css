@@ -4,8 +4,8 @@
 
 @layer base {
   :root {
-    /* Light theme */
-    --background: 220 20% 97%;
+    /* Light theme - clean, professional with teal accents */
+    --background: 210 25% 97%;
     --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
@@ -15,61 +15,61 @@
     --popover-foreground: 222 47% 11%;
 
     /* Teal primary for light mode */
-    --primary: 186 80% 40%;
+    --primary: 186 70% 38%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 186 80% 50%;
+    --primary-glow: 186 70% 48%;
 
-    --secondary: 220 20% 92%;
+    --secondary: 210 20% 93%;
     --secondary-foreground: 222 47% 11%;
 
-    --muted: 220 15% 90%;
-    --muted-foreground: 215 20% 45%;
+    --muted: 210 15% 88%;
+    --muted-foreground: 215 16% 47%;
 
     /* Purple accent for light mode */
-    --accent: 280 70% 55%;
+    --accent: 280 60% 50%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 65% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --success: 150 70% 40%;
+    --success: 150 60% 38%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 92% 50%;
+    --warning: 38 85% 48%;
     --warning-foreground: 222 47% 11%;
 
-    --border: 220 15% 85%;
-    --input: 220 15% 85%;
-    --ring: 186 80% 40%;
+    --border: 210 15% 82%;
+    --input: 210 15% 82%;
+    --ring: 186 70% 38%;
 
     --radius: 0.75rem;
 
     /* Grid specific - light */
-    --grid-line: 220 15% 80%;
-    --grid-line-thick: 186 60% 50%;
-    --cell-hover: 186 80% 40%;
-    --cell-selected: 186 70% 50%;
-    --cell-highlight: 220 20% 92%;
-    --cell-same-number: 280 50% 90%;
-    --cell-error: 0 70% 93%;
-    --cell-preset: 222 47% 25%;
+    --grid-line: 210 15% 78%;
+    --grid-line-thick: 186 50% 45%;
+    --cell-hover: 186 70% 38%;
+    --cell-selected: 186 60% 45%;
+    --cell-highlight: 210 25% 94%;
+    --cell-same-number: 280 40% 92%;
+    --cell-error: 0 60% 94%;
+    --cell-preset: 222 47% 20%;
 
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 222 47% 11%;
-    --sidebar-primary: 186 80% 40%;
+    --sidebar-primary: 186 70% 38%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 20% 92%;
+    --sidebar-accent: 210 20% 93%;
     --sidebar-accent-foreground: 222 47% 11%;
-    --sidebar-border: 220 15% 85%;
-    --sidebar-ring: 186 80% 40%;
+    --sidebar-border: 210 15% 82%;
+    --sidebar-ring: 186 70% 38%;
   }
 
   .dark {
-    /* Dark futuristic theme */
+    /* Dark futuristic theme with neon accents */
     --background: 222 47% 6%;
     --foreground: 210 40% 98%;
 
-    --card: 222 47% 8%;
+    --card: 222 47% 9%;
     --card-foreground: 210 40% 98%;
 
     --popover: 222 47% 10%;
@@ -81,7 +81,7 @@
     --primary-glow: 186 100% 60%;
 
     /* Softer blue secondary */
-    --secondary: 220 60% 20%;
+    --secondary: 220 50% 18%;
     --secondary-foreground: 210 40% 98%;
 
     --muted: 220 30% 15%;
@@ -103,27 +103,27 @@
     --warning: 45 100% 50%;
     --warning-foreground: 222 47% 6%;
 
-    --border: 220 40% 18%;
-    --input: 220 40% 18%;
+    --border: 220 35% 20%;
+    --input: 220 35% 20%;
     --ring: 186 100% 50%;
 
     /* Grid specific */
-    --grid-line: 220 40% 25%;
+    --grid-line: 220 35% 25%;
     --grid-line-thick: 186 80% 40%;
     --cell-hover: 186 100% 50%;
     --cell-selected: 186 100% 40%;
-    --cell-highlight: 220 60% 15%;
-    --cell-same-number: 300 80% 25%;
-    --cell-error: 0 100% 20%;
-    --cell-preset: 210 40% 70%;
+    --cell-highlight: 220 50% 16%;
+    --cell-same-number: 300 70% 22%;
+    --cell-error: 0 100% 18%;
+    --cell-preset: 210 40% 75%;
 
     --sidebar-background: 222 47% 8%;
     --sidebar-foreground: 210 40% 98%;
     --sidebar-primary: 186 100% 50%;
     --sidebar-primary-foreground: 222 47% 6%;
-    --sidebar-accent: 220 60% 20%;
+    --sidebar-accent: 220 50% 18%;
     --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 220 40% 18%;
+    --sidebar-border: 220 35% 20%;
     --sidebar-ring: 186 100% 50%;
   }
 }
