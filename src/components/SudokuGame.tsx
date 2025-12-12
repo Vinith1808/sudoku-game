@@ -436,7 +436,7 @@ export function SudokuGame({ difficulty, onBack, savedGame, dailyBoard, onGameCo
       >
         <button
           onClick={handleSaveAndExit}
-          className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors font-rajdhani"
+          className="flex items-center gap-2 text-foreground hover:text-primary transition-colors font-rajdhani font-medium"
         >
           <ArrowLeft className="w-5 h-5" />
           <span className="hidden sm:inline">Save & Exit</span>
@@ -445,7 +445,7 @@ export function SudokuGame({ difficulty, onBack, savedGame, dailyBoard, onGameCo
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowLeaderboard(true)}
-            className="p-2 rounded-lg bg-secondary text-foreground hover:bg-primary/20 transition-colors"
+            className="p-2 rounded-lg bg-card border border-border text-foreground hover:text-primary hover:border-primary transition-colors"
             title="Leaderboard"
           >
             <Trophy className="w-5 h-5" />
@@ -453,7 +453,7 @@ export function SudokuGame({ difficulty, onBack, savedGame, dailyBoard, onGameCo
 
           <button
             onClick={() => setShowAISolver(true)}
-            className="p-2 rounded-lg bg-secondary text-foreground hover:bg-primary/20 transition-colors"
+            className="p-2 rounded-lg bg-card border border-border text-foreground hover:text-primary hover:border-primary transition-colors"
             title="AI Solver"
           >
             <Cpu className="w-5 h-5" />
@@ -461,7 +461,7 @@ export function SudokuGame({ difficulty, onBack, savedGame, dailyBoard, onGameCo
 
           <button
             onClick={() => setShowSettings(true)}
-            className="p-2 rounded-lg bg-secondary text-foreground hover:bg-primary/20 transition-colors"
+            className="p-2 rounded-lg bg-card border border-border text-foreground hover:text-primary hover:border-primary transition-colors"
             title="Settings"
           >
             <Settings className="w-5 h-5" />
@@ -469,10 +469,10 @@ export function SudokuGame({ difficulty, onBack, savedGame, dailyBoard, onGameCo
 
           <button
             onClick={() => setIsPaused((p) => !p)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary text-foreground hover:bg-primary/20 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-card border border-border text-foreground hover:text-primary hover:border-primary transition-colors"
           >
             {isPaused ? <Play className="w-5 h-5" /> : <Pause className="w-5 h-5" />}
-            <span className="hidden sm:inline font-rajdhani">
+            <span className="hidden sm:inline font-rajdhani font-medium">
               {isPaused ? "Resume" : "Pause"}
             </span>
           </button>
