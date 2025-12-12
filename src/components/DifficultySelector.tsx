@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Zap, Target, Flame, Skull, Trophy, Moon, Sun, RotateCcw, Users, Calendar, Award } from "lucide-react";
+import { Zap, Target, Flame, Skull, Trophy, Moon, Sun, RotateCcw, Users, Calendar, Award, Keyboard } from "lucide-react";
 import type { Difficulty } from "@/lib/sudoku";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/hooks/useTheme";
@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Leaderboard } from "./Leaderboard";
 import DailyChallenge from "./DailyChallenge";
 import Achievements from "./Achievements";
+import KeyboardShortcuts from "./KeyboardShortcuts";
 import { useDailyChallenge } from "@/hooks/useDailyChallenge";
 import { useAchievements } from "@/hooks/useAchievements";
 
@@ -63,6 +64,7 @@ export function DifficultySelector({
   const [showDailyChallenge, setShowDailyChallenge] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
   const [showMultiplayerSelect, setShowMultiplayerSelect] = useState(false);
+  const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
   
   const { dailyChallenge, dailyStats } = useDailyChallenge();
   const { achievements } = useAchievements();
@@ -100,6 +102,16 @@ export function DifficultySelector({
 
       {/* Top controls */}
       <div className="absolute top-4 right-4 flex items-center gap-2 z-20">
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => setShowKeyboardShortcuts(true)}
+          className="p-3 rounded-lg bg-card border border-border text-foreground hover:text-primary transition-colors"
+          title="Keyboard Shortcuts"
+        >
+          <Keyboard className="w-5 h-5" />
+        </motion.button>
+
         <motion.button
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.95 }}
@@ -314,6 +326,15 @@ export function DifficultySelector({
           <Achievements
             achievements={achievements}
             onClose={() => setShowAchievements(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Keyboard shortcuts modal */}
+      <AnimatePresence>
+        {showKeyboardShortcuts && (
+          <KeyboardShortcuts
+            onClose={() => setShowKeyboardShortcuts(false)}
           />
         )}
       </AnimatePresence>

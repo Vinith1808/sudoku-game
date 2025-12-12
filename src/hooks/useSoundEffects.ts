@@ -1,6 +1,6 @@
 import { useCallback, useRef, useEffect, useState } from "react";
 
-type SoundType = "place" | "error" | "hint" | "complete" | "click" | "undo";
+type SoundType = "place" | "error" | "hint" | "complete" | "click" | "undo" | "achievement";
 
 // Web Audio API based sound effects
 function createAudioContext(): AudioContext | null {
@@ -66,6 +66,19 @@ function playUndoSound(ctx: AudioContext) {
   setTimeout(() => playTone(ctx, 300, 0.1, "sine", 0.04), 50);
 }
 
+function playAchievementSound(ctx: AudioContext) {
+  // Triumphant fanfare-like sound
+  const notes = [523, 659, 784, 880, 1047];
+  notes.forEach((freq, i) => {
+    setTimeout(() => playTone(ctx, freq, 0.25, "sine", 0.12), i * 100);
+  });
+  // Add a subtle shimmer effect
+  setTimeout(() => {
+    playTone(ctx, 1318, 0.4, "sine", 0.06);
+    playTone(ctx, 1568, 0.4, "sine", 0.05);
+  }, 500);
+}
+
 export function useSoundEffects() {
   const audioContextRef = useRef<AudioContext | null>(null);
   const [soundEnabled, setSoundEnabled] = useState(() => {
@@ -111,6 +124,9 @@ export function useSoundEffects() {
         break;
       case "undo":
         playUndoSound(ctx);
+        break;
+      case "achievement":
+        playAchievementSound(ctx);
         break;
     }
   }, [soundEnabled, initAudio]);
