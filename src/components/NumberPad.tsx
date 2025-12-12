@@ -47,7 +47,7 @@ export function NumberPad({
                 "border border-border",
                 isComplete
                   ? "bg-muted text-muted-foreground opacity-40 cursor-not-allowed"
-                  : "bg-secondary text-foreground hover:bg-primary hover:text-primary-foreground hover:box-glow-primary",
+                  : "bg-card text-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary",
                 disabled && "opacity-50 cursor-not-allowed"
               )}
             >
@@ -116,10 +116,10 @@ function ActionButton({ onClick, disabled, icon, label, active, variant = "defau
         "font-rajdhani text-sm font-medium",
         "transition-all duration-200 border border-border",
         variant === "accent"
-          ? "bg-warning/10 text-warning hover:bg-warning/20 hover:box-glow-accent border-warning/30"
+          ? "bg-warning/10 text-warning border-warning/30 hover:bg-warning/20 hover:border-warning"
           : active
-            ? "bg-primary text-primary-foreground box-glow-primary"
-            : "bg-secondary text-foreground hover:bg-primary/20",
+            ? "bg-primary text-primary-foreground border-primary"
+            : "bg-card text-foreground hover:bg-primary/10 hover:border-primary/50",
         disabled && "opacity-50 cursor-not-allowed"
       )}
     >

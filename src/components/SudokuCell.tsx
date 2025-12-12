@@ -44,11 +44,11 @@ export function SudokuCell({
         !isSelected && !isRelated && !isSameNumber && !cell.isError && "bg-card hover:bg-cell-highlight",
         isRelated && !isSelected && !cell.isError && "bg-cell-highlight",
         isSameNumber && !isSelected && !cell.isError && "bg-cell-same-number",
-        isSelected && !cell.isError && "bg-primary/20 box-glow-primary",
+        isSelected && !cell.isError && "bg-primary/20 ring-2 ring-primary/50",
         cell.isError && "bg-cell-error",
-        // Text colors
-        cell.isPreset ? "text-cell-preset" : "text-primary",
-        cell.isError && "text-destructive"
+        // Text colors - ensure visibility in both modes
+        cell.isPreset ? "text-foreground font-bold" : "text-primary font-semibold",
+        cell.isError && "text-destructive font-bold"
       )}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}

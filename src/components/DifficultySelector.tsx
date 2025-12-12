@@ -155,7 +155,7 @@ export function DifficultySelector({
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="text-center mb-8 relative z-10"
       >
-        <h1 className="text-4xl sm:text-6xl md:text-7xl font-orbitron font-bold text-glow-primary mb-4">
+        <h1 className="text-4xl sm:text-6xl md:text-7xl font-orbitron font-bold text-primary text-glow-primary mb-4">
           SUDOKU
         </h1>
         <p className="text-lg sm:text-xl text-muted-foreground font-rajdhani">
