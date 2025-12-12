@@ -1,6 +1,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Trophy } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import type { Achievement } from '@/hooks/useAchievements';
+import { useSoundEffects } from '@/hooks/useSoundEffects';
 
 interface AchievementToastProps {
   achievements: Achievement[];
@@ -8,6 +10,20 @@ interface AchievementToastProps {
 }
 
 const AchievementToast = ({ achievements, onDismiss }: AchievementToastProps) => {
+  const { playSound, initAudio } = useSoundEffects();
+  const hasPlayedSound = useRef(false);
+
+  useEffect(() => {
+    if (achievements.length > 0 && !hasPlayedSound.current) {
+      initAudio();
+      playSound('achievement');
+      hasPlayedSound.current = true;
+    }
+    if (achievements.length === 0) {
+      hasPlayedSound.current = false;
+    }
+  }, [achievements, playSound, initAudio]);
+
   if (achievements.length === 0) return null;
 
   return (
