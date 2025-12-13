@@ -7,7 +7,7 @@ import { componentTagger } from "lovable-tagger";
 export default defineConfig(({ mode }) => ({
   // For GitHub Pages: set base to your repo name (e.g., '/sudoku-game/')
   // Leave as '/' for Lovable preview or custom domain
-  base: process.env.GITHUB_ACTIONS ? './' : '/',
+  base: '/sudoku-game/',
   server: {
     host: "::",
     port: 8080,
