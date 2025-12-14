@@ -1,73 +1,53 @@
-# Welcome to your Lovable project
+🚀 Holographic Cyber Grid Sudoku
 
-## Project info
+Holographic Cyber Grid Sudoku is a next-generation, futuristic Sudoku web application featuring a hologram-inspired UI, neon cyber aesthetics, advanced animations, and an intelligent Sudoku engine. Designed as a portfolio-grade project, it combines modern front-end engineering, motion design, and game logic into an immersive puzzle experience.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+Built with a sci-fi control-panel aesthetic, the game features transparent holographic tiles, glowing neon grids, laser-scan highlights, glitch effects for incorrect moves, and cinematic transitions powered by GSAP and particle systems.
 
-## How can I edit this code?
+✨ Key Highlights
 
-There are several ways of editing your application.
+Futuristic holographic UI with neon cyber visuals
 
-**Use Lovable**
+Smooth GSAP animations & transitions (tile materialization, beam input, glitch effects)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+Intelligent Sudoku generator & solver with guaranteed unique puzzles
 
-Changes made via Lovable will be committed automatically to this repo.
+Step-by-step solver visualizer showcasing logical solving techniques
 
-**Use your preferred IDE**
+Dynamic particle background using WebGL / Vanta.js
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Fully responsive & keyboard-accessible gameplay
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Dark/Light hologram modes with performance optimizations
 
-Follow these steps:
+Built specifically to demonstrate advanced UI engineering & motion design
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+🛠 Tech Stack
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+React (component-driven UI)
 
-# Step 3: Install the necessary dependencies.
-npm i
+GSAP (high-performance animations)
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+CSS3 + Hologram effects (neon glow, blur, transitions)
 
-**Edit a file directly in GitHub**
+Vanta.js / Three.js (particle backgrounds)
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Custom Sudoku Engine (generator, solver, validator)
 
-**Use GitHub Codespaces**
+🎯 Purpose
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+This project was created to showcase:
 
-## What technologies are used for this project?
+Advanced front-end development skills
 
-This project is built with:
+Interactive motion design
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+Game logic engineering
 
-## How can I deploy this project?
+Creative UI/UX thinking
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+Portfolio-quality visual polish
 
-## Can I connect a custom domain to my Lovable project?
+🌐 Live Demo
 
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+https://new-gensudokugame.lovable.app/
