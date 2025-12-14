@@ -5,9 +5,9 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  // For GitHub Pages: set base to your repo name (e.g., '/sudoku-game/')
+  // For GitHub Pages: set base to your repo name
   // Leave as '/' for Lovable preview or custom domain
-  base: process.env.GITHUB_ACTIONS ? './' : '/',
+  base: process.env.GITHUB_ACTIONS ? '/sudoku-game/' : '/',
   server: {
     host: "::",
     port: 8080,
